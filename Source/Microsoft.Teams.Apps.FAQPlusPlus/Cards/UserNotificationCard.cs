@@ -9,6 +9,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
     using AdaptiveCards;
     using Microsoft.Bot.Schema;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models;
+    using Microsoft.Teams.Apps.FAQPlusPlus.Models;
     using Microsoft.Teams.Apps.FAQPlusPlus.Properties;
 
     /// <summary>
@@ -21,7 +22,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <summary>
         /// Initializes a new instance of the <see cref="UserNotificationCard"/> class.
         /// </summary>
-        /// <param name="ticket">The ticket to create a card from.</param>
+        /// <param name="ticket">The ticket to create a card from</param>
         public UserNotificationCard(TicketEntity ticket)
         {
             this.ticket = ticket;
@@ -30,26 +31,26 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <summary>
         /// Returns a user notification card for the ticket.
         /// </summary>
-        /// <param name="message">The status message to add to the card.</param>
+        /// <param name="message">The status message to add to the card</param>
         /// <param name="activityLocalTimestamp">Local time stamp of user activity.</param>
-        /// <returns>An adaptive card as an attachment.</returns>
+        /// <returns>An adaptive card as an attachment</returns>
         public Attachment ToAttachment(string message, DateTimeOffset? activityLocalTimestamp)
         {
-            var card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0))
+            var card = new AdaptiveCard("1.0")
             {
                 Body = new List<AdaptiveElement>
                 {
                     new AdaptiveTextBlock
                     {
-                        Text = message.Replace("\\t", "\t").Replace("\\n", "\n").Replace("\\r\n", "\r\n"),
+                        Text = message,
                         Wrap = true,
                     },
                     new AdaptiveFactSet
                     {
-                      Facts = this.BuildFactSet(this.ticket, activityLocalTimestamp),
+                      Facts = this.BuildFactSet(this.ticket, activityLocalTimestamp)
                     },
                 },
-                Actions = BuildActions(this.ticket),
+                Actions = this.BuildActions(this.ticket),
             };
 
             return new Attachment
@@ -64,7 +65,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// </summary>
         /// <param name="ticket">The current ticket information.</param>
         /// <returns>A list of adaptive card actions.</returns>
-        private static List<AdaptiveAction> BuildActions(TicketEntity ticket)
+        private List<AdaptiveAction> BuildActions(TicketEntity ticket)
         {
             if (ticket.Status == (int)TicketState.Closed)
             {
@@ -72,17 +73,17 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
                 {
                     new AdaptiveSubmitAction
                     {
-                        Title = Strings.AskAnExpertButtonText,
+                        Title = Resource.AskAnExpertButtonText,
                         Data = new TeamsAdaptiveSubmitActionData
                         {
                             MsTeams = new CardAction
                             {
                                 Type = ActionTypes.MessageBack,
-                                DisplayText = Strings.AskAnExpertDisplayText,
-                                Text = Strings.AskAnExpertDisplayText,
-                            },
-                        },
-                    },
+                                DisplayText = Resource.AskAnExpertDisplayText,
+                                Text = Resource.AskAnExpertDisplayText
+                            }
+                        }
+                    }
                 };
             }
 
@@ -100,13 +101,13 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
             List<AdaptiveFact> factList = new List<AdaptiveFact>();
             factList.Add(new AdaptiveFact
             {
-                Title = Strings.StatusFactTitle,
+                Title = Resource.StatusFactTitle,
                 Value = CardHelper.GetUserTicketDisplayStatus(this.ticket),
             });
 
             factList.Add(new AdaptiveFact
             {
-                Title = Strings.TitleFact,
+                Title = Resource.TitleFact,
                 Value = CardHelper.TruncateStringIfLonger(this.ticket.Title, CardHelper.TitleMaxDisplayLength),
             });
 
@@ -114,14 +115,14 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
             {
                 factList.Add(new AdaptiveFact
                 {
-                    Title = Strings.DescriptionFact,
+                    Title = Resource.DescriptionFact,
                     Value = CardHelper.TruncateStringIfLonger(this.ticket.Description, CardHelper.DescriptionMaxDisplayLength),
                 });
             }
 
             factList.Add(new AdaptiveFact
             {
-                Title = Strings.DateCreatedDisplayFactTitle,
+                Title = Resource.DateCreatedDisplayFactTitle,
                 Value = CardHelper.GetFormattedDateInUserTimeZone(this.ticket.DateCreated, activityLocalTimestamp),
             });
 
@@ -129,7 +130,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
             {
                 factList.Add(new AdaptiveFact
                 {
-                    Title = Strings.ClosedFactTitle,
+                    Title = Resource.ClosedFactTitle,
                     Value = CardHelper.GetFormattedDateInUserTimeZone(this.ticket.DateClosed.Value, activityLocalTimestamp),
                 });
             }

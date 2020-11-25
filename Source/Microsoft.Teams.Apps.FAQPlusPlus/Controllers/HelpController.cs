@@ -7,7 +7,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Providers;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Properties;
 
     /// <summary>
     /// This is a Static tab controller class which will be used to display Help
@@ -16,13 +15,13 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
     [Route("/help")]
     public class HelpController : Controller
     {
-        private readonly IConfigurationDataProvider configurationProvider;
+        private readonly IConfigurationProvider configurationProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HelpController"/> class.
         /// </summary>
-        /// <param name="configurationProvider">Configuration provider dependency injection.</param>
-        public HelpController(IConfigurationDataProvider configurationProvider)
+        /// <param name="configurationProvider">configurationProvider DI</param>
+        public HelpController(IConfigurationProvider configurationProvider)
         {
             this.configurationProvider = configurationProvider;
         }
@@ -30,13 +29,14 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
         /// <summary>
         /// Display help tab.
         /// </summary>
-        /// <returns>Help tab view.</returns>
+        /// <returns>Help tab view</returns>
         public async Task<ActionResult> Index()
         {
-            //string helpTabText = await this.configurationProvider.GetSavedEntityDetailAsync(ConfigurationEntityTypes.HelpTabText).ConfigureAwait(false);
-            string helpTabText = Strings.HelpContent.Replace("\\t", "\t").Replace("\\n", "\n").Replace("\\r\n", "\r\n");
+            string helpTabText = await this.configurationProvider.GetSavedEntityDetailAsync(ConfigurationEntityTypes.HelpTabText);
+
             var marked = new MarkedNet.Marked();
             var helpTabHtml = marked.Parse(helpTabText);
+
             return this.View(nameof(this.Index), helpTabHtml);
         }
     }

@@ -6,66 +6,64 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using AdaptiveCards;
     using Microsoft.Bot.Schema;
     using Microsoft.Bot.Schema.Teams;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models;
+    using Microsoft.Teams.Apps.FAQPlusPlus.Models;
     using Microsoft.Teams.Apps.FAQPlusPlus.Properties;
 
     /// <summary>
     ///  This class process sending a notification card to SME team-
     ///  whenever user submits a feedback through bot menu or from response card.
     /// </summary>
-    public static class SmeFeedbackCard
+    public class SmeFeedbackCard
     {
         /// <summary>
         /// This method will construct the card for SME team which will have the
         /// feedback details given by the user.
         /// </summary>
-        /// <param name="data">User activity payload.</param>
+        /// <param name="data">user activity payload</param>
         /// <param name="userDetails">User details.</param>
         /// <returns>Sme facing feedback notification card.</returns>
         public static Attachment GetCard(ShareFeedbackCardPayload data, TeamsChannelAccount userDetails)
         {
             // Constructing adaptive card that is sent to SME team.
-            AdaptiveCard smeFeedbackCard = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0))
+            AdaptiveCard smeFeedbackCard = new AdaptiveCard("1.0")
             {
-                Body = new List<AdaptiveElement>
+               Body = new List<AdaptiveElement>
                {
                    new AdaptiveTextBlock()
                    {
-                       Text = Strings.SMEFeedbackHeaderText,
+                       Text = Resource.SMEFeedbackHeaderText,
                        Weight = AdaptiveTextWeight.Bolder,
                        Size = AdaptiveTextSize.Medium,
                    },
                    new AdaptiveTextBlock()
                    {
-                       Text = string.Format(CultureInfo.InvariantCulture, Strings.FeedbackAlertText, userDetails?.Name),
+                       Text = string.Format(Resource.FeedbackAlertText, userDetails.Name),
                        Wrap = true,
                    },
                    new AdaptiveTextBlock()
                    {
-                       Text = Strings.RatingTitle,
+                       Text = Resource.RatingTitle,
                        Weight = AdaptiveTextWeight.Bolder,
                        Wrap = true,
                    },
                    new AdaptiveTextBlock()
                    {
-                       Text = GetRatingDisplayText(data?.Rating),
+                       Text = GetRatingDisplayText(data.Rating),
                        Spacing = AdaptiveSpacing.None,
                        Wrap = true,
                    },
                },
-                Actions = new List<AdaptiveAction>
+               Actions = new List<AdaptiveAction>
                {
                    new AdaptiveOpenUrlAction
                    {
-                       Title = string.Format(CultureInfo.InvariantCulture, Strings.ChatTextButton, userDetails?.GivenName),
-                       UrlString = $"https://teams.microsoft.com/l/chat/0/0?users={Uri.EscapeDataString(userDetails.UserPrincipalName)}",
-                   },
-               },
+                       Title = string.Format(Resource.ChatTextButton, userDetails.GivenName),
+                       UrlString = $"https://teams.microsoft.com/l/chat/0/0?users={Uri.EscapeDataString(userDetails.UserPrincipalName)}"
+                   }
+               }
             };
 
             // Description fact is available in the card only when user enters description text.
@@ -73,11 +71,10 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
             {
                 smeFeedbackCard.Body.Add(new AdaptiveTextBlock()
                 {
-                    Text = Strings.DescriptionText,
+                    Text = Resource.DescriptionText,
                     Weight = AdaptiveTextWeight.Bolder,
                     Wrap = true,
                 });
-
                 smeFeedbackCard.Body.Add(new AdaptiveTextBlock()
                 {
                     Text = CardHelper.TruncateStringIfLonger(data.Description, CardHelper.DescriptionMaxDisplayLength),
@@ -95,29 +92,28 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
                     {
                         new AdaptiveFact()
                         {
-                            Title = Strings.QuestionAskedFactTitle,
+                            Title = Resource.QuestionAskedFactTitle,
                             Value = data.UserQuestion,
                         },
-                    },
+                    }
                 });
-
                 smeFeedbackCard.Actions.AddRange(new List<AdaptiveAction>
                 {
                     new AdaptiveShowCardAction
                     {
-                        Title = Strings.ViewArticleButtonText,
-                        Card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0))
+                        Title = Resource.ViewArticleButtonText,
+                        Card = new AdaptiveCard("1.0")
                         {
                             Body = new List<AdaptiveElement>
                             {
                                new AdaptiveTextBlock
                                {
                                    Text = CardHelper.TruncateStringIfLonger(data.KnowledgeBaseAnswer, CardHelper.KnowledgeBaseAnswerMaxDisplayLength),
-                                   Wrap = true,
-                               },
-                            },
-                        },
-                    },
+                                   Wrap = true
+                               }
+                            }
+                        }
+                    }
                 });
             }
 
@@ -136,7 +132,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
                 throw new ArgumentException($"{rating} is not a valid rating value", nameof(rating));
             }
 
-            return Strings.ResourceManager.GetString($"{rating}RatingText", CultureInfo.InvariantCulture);
+            return Resource.ResourceManager.GetString($"{rating}RatingText");
         }
     }
 }

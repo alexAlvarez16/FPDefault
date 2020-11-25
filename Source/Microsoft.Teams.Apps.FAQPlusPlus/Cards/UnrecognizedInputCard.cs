@@ -7,8 +7,8 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
     using System.Collections.Generic;
     using AdaptiveCards;
     using Microsoft.Bot.Schema;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models;
+    using Microsoft.Teams.Apps.FAQPlusPlus.Bots;
+    using Microsoft.Teams.Apps.FAQPlusPlus.Models;
     using Microsoft.Teams.Apps.FAQPlusPlus.Properties;
 
     /// <summary>
@@ -23,81 +23,33 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <returns>UnrecognizedInput Card.</returns>
         public static Attachment GetCard(string userQuestion)
         {
-            AdaptiveCard unrecognizedInputCard = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0))
+            AdaptiveCard unrecognizedInputCard = new AdaptiveCard("1.0")
             {
                 Body = new List<AdaptiveElement>
                 {
                     new AdaptiveTextBlock
                     {
-                        Text = Strings.CustomMessage,
-                        Wrap = true,
-                    },
+                        Text = Resource.CustomMessage,
+                        Wrap = true
+                    }
                 },
                 Actions = new List<AdaptiveAction>
                 {
                     new AdaptiveSubmitAction
                     {
-                        Title = Strings.AskAnExpertButtonText,
+                        Title = Resource.AskAnExpertButtonText,
                         Data = new ResponseCardPayload
                         {
                             MsTeams = new CardAction
                             {
                                 Type = ActionTypes.MessageBack,
-                                DisplayText = Strings.AskAnExpertDisplayText,
-                                Text = Constants.AskAnExpert,
+                                DisplayText = Resource.AskAnExpertDisplayText,
+                                Text = FaqPlusPlusBot.AskAnExpert
                             },
-                            UserQuestion = userQuestion,
+                            UserQuestion = userQuestion
                         },
-                    },
-                },
-            };
-
-            return new Attachment
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = unrecognizedInputCard,
-            };
-        }
-
-        public static Attachment GetCard(string userQuestion, Microsoft.Bot.Schema.Teams.TeamsChannelAccount member)
-        {
-            string txtCustomMessage = string.Empty;
-            if (member.GivenName != null)
-            {
-                txtCustomMessage = string.Format(Strings.CustomMessageUser, member.GivenName);
-            }
-            else
-            {
-                txtCustomMessage = Strings.CustomMessage;
-            }
-
-            AdaptiveCard unrecognizedInputCard = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0))
-            {
-                Body = new List<AdaptiveElement>
-                {
-                    new AdaptiveTextBlock
-                    {
-                        Text = txtCustomMessage,
-                        Wrap = true,
-                    },
-                },
-                Actions = new List<AdaptiveAction>
-                {
-                    new AdaptiveSubmitAction
-                    {
-                        Title = Strings.AskAnExpertButtonText,
-                        Data = new ResponseCardPayload
-                        {
-                            MsTeams = new CardAction
-                            {
-                                Type = ActionTypes.MessageBack,
-                                DisplayText = Strings.AskAnExpertDisplayText,
-                                Text = Constants.AskAnExpert,
-                            },
-                            UserQuestion = userQuestion,
-                        },
-                    },
-                },
+                    }
+                }
             };
 
             return new Attachment

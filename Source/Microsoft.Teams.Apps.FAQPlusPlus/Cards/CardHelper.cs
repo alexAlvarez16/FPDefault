@@ -5,8 +5,6 @@
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
 {
     using System;
-    using System.Globalization;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models;
     using Microsoft.Teams.Apps.FAQPlusPlus.Properties;
 
@@ -21,12 +19,12 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         public const int KnowledgeBaseAnswerMaxDisplayLength = 500;
 
         /// <summary>
-        /// Maximum length of the user title.
+        /// Maximum length of the user title
         /// </summary>
         public const int TitleMaxDisplayLength = 50;
 
         /// <summary>
-        /// Maximum length of the user description.
+        /// Maximum length of the user description
         /// </summary>
         public const int DescriptionMaxDisplayLength = 500;
 
@@ -40,7 +38,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <returns>Truncated string.</returns>
         public static string TruncateStringIfLonger(string text, int maxLength)
         {
-            if ((!string.IsNullOrEmpty(text)) && (text.Length > maxLength))
+            if ((text != null) && (text.Length > maxLength))
             {
                 text = text.Substring(0, maxLength) + Ellipsis;
             }
@@ -55,15 +53,15 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <returns>A status string.</returns>
         public static string GetUserTicketDisplayStatus(TicketEntity ticket)
         {
-            if (ticket?.Status == (int)TicketState.Open)
+            if (ticket.Status == (int)TicketState.Open)
             {
                 return ticket.IsAssigned() ?
-                    Strings.AssignedUserNotificationStatus :
-                    Strings.UnassignedUserNotificationStatus;
+                    Resource.AssignedUserNotificationStatus :
+                    Resource.UnassignedUserNotificationStatus;
             }
             else
             {
-                return Strings.ClosedUserNotificationStatus;
+                return Resource.ClosedUserNotificationStatus;
             }
         }
 
@@ -74,15 +72,15 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <returns>A status string.</returns>
         public static string GetTicketDisplayStatusForSme(TicketEntity ticket)
         {
-            if (ticket?.Status == (int)TicketState.Open)
+            if (ticket.Status == (int)TicketState.Open)
             {
                 return ticket.IsAssigned() ?
-                    string.Format(CultureInfo.InvariantCulture, Strings.SMETicketAssignedStatus, ticket?.AssignedToName) :
-                    Strings.SMETicketUnassignedStatus;
+                    string.Format(Resource.SMETicketAssignedStatus, ticket.AssignedToName) :
+                    Resource.SMETicketUnassignedStatus;
             }
             else
             {
-                return Strings.SMETicketClosedStatus;
+                return Resource.SMETicketClosedStatus;
             }
         }
 
@@ -94,7 +92,8 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Cards
         /// <returns>A datetime string.</returns>
         public static string GetFormattedDateInUserTimeZone(DateTime dateTime, DateTimeOffset? userLocalTime)
         {
-            // Adaptive card on mobile has a bug where it does not support DATE and TIME, so for now we convert the date and time manually.
+            // Adaptive card on mobile has a bug where it does not support DATE and TIME, so for now we convert the date and time manually
+            // TODO: Change to use DATE() function
             return dateTime.Add(userLocalTime?.Offset ?? TimeSpan.FromMinutes(0)).ToShortDateString();
         }
     }
